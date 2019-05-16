@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="pepXML_std.xsl"?>
+<msms_pipeline_analysis date= "{{ parameters.date }}" summary_xml="{{ path_to_output }}" xmlns="http://regis-web.systemsbiology.net/pepXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://sashimi.sourceforge.net/schema_revision/pepXML/pepXML_v117.xsd">
+   {%- for base in bases %}
+   <msms_run_summary base_name="{{ base.source_file }}" search_engine="X! Tandem" raw_data_type="raw" raw_data=".?">
+   {%- for psm in base.psms %}
+   <spectrum_query spectrum="{{ psm.spectrum }}" start_scan="{{ psm.start_scan }}" end_scan="{{ psm.end_scan }}" precursor_neutral_mass="{{ '{:.6f}'.format(psm.precursor_neutral_mass) }}" assumed_charge="{{ psm.assumed_charge }}" index="{{ loop.index }}"{%- if psm.rt is not none %} retention_time_sec="{{ psm.rt }}"{%- endif %}>
+      <search_result>
+          <search_hit hit_rank="{{ psm.hit_rank }}" peptide="{{ psm.sequence }}" massdiff="{{ psm.mass_diff }}" num_tot_proteins="{{ psm.num_tot_proteins }}" protein="{{ psm.protein }}" >
+         {%- for protein in psm.alternative_proteins %}
+            <alternative_protein protein="{{ protein }}""/>
+         {%- endfor %}
+         {%- if psm.modifications or psm.mod_label_n or psm.mod_label_c %}
+            <modification_info{{ psm.mod_label|safe }}>
+         {%- endif %}
+         {%- for modification in psm.modifications %}
+               <mod_aminoacid_mass position="{{ modification.position }}" mass="{{ modification.mass }}" />
+         {%- endfor %}
+         {%- if psm.modifications or psm.mod_label_n or psm.mod_label_c %}
+            </modification_info>
+         {%- endif %}
+         {%- for score_name, score_value in psm.scores.items() %}
+            <search_score name="{{ score_name }}" value="{{ score_value }}"/>
+         {%- endfor %}
+         </search_hit>
+      </search_result>
+      </spectrum_query>
+   {%- endfor %}
+   </msms_run_summary>
+   {%- endfor %}
+</msms_pipeline_analysis>
