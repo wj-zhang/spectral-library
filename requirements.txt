@@ -1,5 +1,5 @@
 cvxopt==1.2.2
-Jinja2==2.10
+Jinja2>=2.10.1
 matplotlib==3.0.2
 lxml==4.2.5
 numpy==1.15.1
